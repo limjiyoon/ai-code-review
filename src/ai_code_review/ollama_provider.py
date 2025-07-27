@@ -23,11 +23,12 @@ class OllamaProvider:
         model: str,
     ):
         """Initialize the OllamaProvider with the server URL, port, and model."""
-        self._url = url
-        self._port = port
+        self._url = f"http://{url}:{port}/api/generate"
         self._model = model
-        self._generate_url = f"http://{self._url}:{self._port}/api/generate"
-        self._headers = {"Content-Type": "application/json"}
+        self._headers = {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer 1234"
+        }
 
     async def stream_generate(
         self,
@@ -51,10 +52,11 @@ class OllamaProvider:
         }
         if system_prompt:
             payload["system"] = system_prompt
+        print(f"Sending request to {self._url} with headers {self._headers}")
 
         async with (
             aiohttp.ClientSession() as session,
-            session.post(self._generate_url, json=payload, headers=self._headers) as response,
+            session.post(self._url, json=payload, headers=self._headers) as response,
         ):
             if response.status != HTTP_OK_STATUS:
                 logger.error(f"Error: {response.status}")
