@@ -3,14 +3,11 @@
 import asyncio
 from pathlib import Path
 
-import aiohttp
 import click
-import orjson as json
 from loguru import logger
 
 from ai_code_review.code_explorer import CodeExplorer
-
-HTTP_OK_STATUS = 200
+from ai_code_review.ollama_provider import OllamaProvider
 
 
 @click.command()
@@ -72,36 +69,23 @@ async def review(ollama_url: str, ollama_port: int, ollama_model: str, project_r
         "Please provide a detailed analysis."
     )
 
-    ollama_url = f"http://{ollama_url}:{ollama_port}/api/generate"
     explorer = CodeExplorer(
         project_root=project_root,
         extensions=["py"],
     )
     code = explorer.explore()
 
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "model": ollama_model,
-        "prompt": code,
-        "system": code_review_prompt,
-        "stream": True,
-    }
-
-    async with (
-        aiohttp.ClientSession() as session,
-        session.post(ollama_url, headers=headers, data=json.dumps(payload)) as response,
+    llm_provider = OllamaProvider(
+        url=ollama_url,
+        port=ollama_port,
+        model=ollama_model,
+    )
+    logger.info(f"Reviewing code in {project_root} using model {ollama_model} at {ollama_url}:{ollama_port}")
+    async for chunk in llm_provider.stream_generate(
+        prompt=code,
+        system_prompt=code_review_prompt,
     ):
-        if response.status != HTTP_OK_STATUS:
-            logger.error(f"Error: {response.status}")
-            return
-
-        async for line in response.content:
-            if line.strip():
-                try:
-                    data = json.loads(line)
-                    print(data.get("response", ""), end="")
-                except json.JSONDecodeError as e:
-                    logger.error(f"JSON decode error: {e}")
+        print(chunk, end="", flush=True)
 
 
 if __name__ == "__main__":
