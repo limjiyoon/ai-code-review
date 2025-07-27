@@ -25,10 +25,7 @@ class OllamaProvider:
         """Initialize the OllamaProvider with the server URL, port, and model."""
         self._url = f"http://{url}:{port}/api/generate"
         self._model = model
-        self._headers = {
-            "Content-Type": "application/json",
-            "Authorization": "Bearer 1234"
-        }
+        self._headers = {"Content-Type": "application/json", "Authorization": "Bearer 1234"}
 
     async def stream_generate(
         self,

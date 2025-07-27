@@ -8,7 +8,6 @@ from loguru import logger
 
 from ai_code_review.code_explorer import CodeExplorer
 from ai_code_review.ollama_provider import OllamaProvider
-
 from ai_code_review.prompt_factory import PromptFactory
 
 
@@ -65,7 +64,6 @@ async def review(ollama_url: str, ollama_port: int, ollama_model: str, project_r
         json.JSONDecodeError: If the response cannot be parsed as JSON.
 
     """
-
     explorer = CodeExplorer(
         project_root=project_root,
         extensions=["py"],
