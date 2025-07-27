@@ -1,0 +1,110 @@
+[project]
+name = ""
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "limjiyoon", email = "luinpark@gmail.com" }
+]
+dependencies = []
+readme = "README.md"
+requires-python = ">= 3.13"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+managed = true
+dev-dependencies = [
+    "pyright>=1.1.400",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "pre-commit>=4.2.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/"]
+
+[tool.ruff]
+# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
+line-length = 120
+lint.select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep-naming
+    "D",  # pydocstyle
+    "B",  # flakes-bugbear
+    "ANN",# flakes-annotations
+    "A",  # flakes-builtins
+    "COM",# flakes-commas
+    "T10",# flakes-debugger
+    "SIM",# flakes-simplify
+    "ARG",# flakes-unused-arguments
+    "PLC",# pylint-convention
+    "PLE",# pylint-errors
+    "UP",  # pyupgrade
+    "PL"  # pylint
+]
+
+# Allow autofix for all enabled rules (when `--fix`) is provided.
+lint.fixable = ["ALL"]
+lint.ignore = [
+    "D104",
+    "D406",
+    "D407",
+    "D408",
+    "D409",
+    "D203",
+    "D213",
+    "D417",
+    "B905",
+    "ANN002",
+    "ANN003",
+    "ANN401",
+    "ANN204",
+    "COM812",
+    "D107",
+    "N812",
+]
+
+# Exclude a variety of commonly ignored directories.
+lint.exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+
+[tool.pyright]
+reportMissingImports = true
+
+lint.pylint.max-args = 12
+lint.pylint.max-statements = 60
+lint.pydocstyle.convention = "google"
+lint.pydocstyle.property-decorators = ["gi.repository.GObject.Property"]
+
+[lint.pep8-naming]
+# For pydantic
+classmethod-decorators = ["classmethod", "pydantic.field_validator"]
+
