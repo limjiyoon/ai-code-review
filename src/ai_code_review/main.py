@@ -1,11 +1,14 @@
 """Entry point for the AI code review application."""
 
 import asyncio
+from pathlib import Path
 
 import aiohttp
 import click
 import orjson as json
 from loguru import logger
+
+from ai_code_review.code_explorer import CodeExplorer
 
 HTTP_OK_STATUS = 200
 
@@ -33,30 +36,30 @@ HTTP_OK_STATUS = 200
     show_default=True,
 )
 @click.option(
-    "--code",
-    type=str,
-    help="The code snippet to review.",
-    required=True,
+    "--project-root",
+    type=Path,
+    help="Path to the project root directory containing code files.",
+    default=Path.cwd().parent,
     show_default=True,
 )
 def main(
-    ollama_url: str = "localhost",
-    ollama_port: int = 11434,
-    ollama_model: str = "devstral",
-    code: str = "",
+    ollama_url: str,
+    ollama_port: int,
+    ollama_model: str,
+    project_root: str,
 ) -> None:
     """Run the AI code review application."""
-    asyncio.run(review(ollama_url, ollama_port, ollama_model, code))
+    asyncio.run(review(ollama_url, ollama_port, ollama_model, project_root))
 
 
-async def review(ollama_url: str, ollama_port: int, ollama_model: str, code: str) -> None:
+async def review(ollama_url: str, ollama_port: int, ollama_model: str, project_root: str) -> None:
     """Orchestrates the code review process.
 
     Args:
         ollama_url (str): The URL of the Ollama server.
         ollama_port (int): The port of the Ollama server.
         ollama_model (str): The model to use for code review.
-        code (str): The code snippet to review.
+        project_root (str): The code snippet to review.
 
     Raises:
         aiohttp.ClientError: If there is an issue with the HTTP request.
@@ -70,6 +73,12 @@ async def review(ollama_url: str, ollama_port: int, ollama_model: str, code: str
     )
 
     ollama_url = f"http://{ollama_url}:{ollama_port}/api/generate"
+    explorer = CodeExplorer(
+        project_root=project_root,
+        extensions=["py"],
+    )
+    code = explorer.explore()
+
     headers = {"Content-Type": "application/json"}
     payload = {
         "model": ollama_model,
