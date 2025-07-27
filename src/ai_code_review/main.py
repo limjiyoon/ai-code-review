@@ -3,34 +3,84 @@
 import asyncio
 
 import aiohttp
+import click
 import orjson as json
 from loguru import logger
 
 HTTP_OK_STATUS = 200
 
 
-async def main() -> None:
-    """Orchestrates the code review process."""
+@click.command()
+@click.option(
+    "--ollama-url",
+    default="localhost",
+    type=str,
+    help="The URL of the Ollama server (default: localhost).",
+    show_default=True,
+)
+@click.option(
+    "--ollama-port",
+    default=11434,
+    type=int,
+    help="The port of the Ollama server (default: 11434).",
+    show_default=True,
+)
+@click.option(
+    "--ollama-model",
+    default="devstral",
+    type=str,
+    help="The model to use for code review (default: devstral).",
+    show_default=True,
+)
+@click.option(
+    "--code",
+    type=str,
+    help="The code snippet to review.",
+    # required=True,
+    show_default=True,
+)
+def main(
+    ollama_url: str = "localhost",
+    ollama_port: int = 11434,
+    ollama_model: str = "devstral",
+    code: str = "",
+) -> None:
+    """Run the AI code review application."""
+    asyncio.run(review(ollama_url, ollama_port, ollama_model, code))
+
+
+async def review(ollama_url: str, ollama_port: int, ollama_model: str, code: str) -> None:
+    """Orchestrates the code review process.
+
+    Args:
+        ollama_url (str): The URL of the Ollama server.
+        ollama_port (int): The port of the Ollama server.
+        ollama_model (str): The model to use for code review.
+        code (str): The code snippet to review.
+
+    Raises:
+        aiohttp.ClientError: If there is an issue with the HTTP request.
+        json.JSONDecodeError: If the response cannot be parsed as JSON.
+
+    """
     code_review_prompt = (
         "You are an AI code reviewer."
         "Your task is to review the provided code and give feedback on its quality, style, and potential improvements."
         "Please provide a detailed analysis."
     )
 
-    test_code_snippet = """def add(a, b):
-    return a + b"""
-    ollam_url = "http://localhost:11434/api/generate"
+    ollama_url = f"http://{ollama_url}:{ollama_port}/api/generate"
     headers = {"Content-Type": "application/json"}
     payload = {
-        "model": "devstral",
-        "prompt": test_code_snippet,
+        "model": ollama_model,
+        "prompt": code,
         "system": code_review_prompt,
         "stream": True,
     }
 
     async with (
         aiohttp.ClientSession() as session,
-        session.post(ollam_url, headers=headers, data=json.dumps(payload)) as response,
+        session.post(ollama_url, headers=headers, data=json.dumps(payload)) as response,
     ):
         if response.status != HTTP_OK_STATUS:
             logger.error(f"Error: {response.status}")
@@ -46,4 +96,4 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
