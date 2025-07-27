@@ -36,7 +36,7 @@ HTTP_OK_STATUS = 200
     "--code",
     type=str,
     help="The code snippet to review.",
-    # required=True,
+    required=True,
     show_default=True,
 )
 def main(
