@@ -4,11 +4,10 @@ import asyncio
 from pathlib import Path
 
 import click
-from loguru import logger
 
 from ai_code_review.code_explorer import CodeExplorer
 from ai_code_review.ollama_provider import OllamaProvider
-from ai_code_review.prompt_factory import PromptFactory
+from ai_code_review.reviewer import Reviewer
 
 
 @click.command()
@@ -35,7 +34,7 @@ from ai_code_review.prompt_factory import PromptFactory
 )
 @click.option(
     "--ollama-model",
-    default="devstral",
+    default="qwen2.5-coder:7b",
     type=str,
     help="The model to use for code review (default: devstral).",
     show_default=True,
@@ -47,40 +46,20 @@ def main(
     ollama_model: str,
 ) -> None:
     """Run the AI code review application."""
-    asyncio.run(review(ollama_url, ollama_port, ollama_model, project_root))
-
-
-async def review(ollama_url: str, ollama_port: int, ollama_model: str, project_root: str) -> None:
-    """Orchestrates the code review process.
-
-    Args:
-        project_root (str): The code snippet to review.
-        ollama_url (str): The URL of the Ollama server.
-        ollama_port (int): The port of the Ollama server.
-        ollama_model (str): The model to use for code review.
-
-    Raises:
-        aiohttp.ClientError: If there is an issue with the HTTP request.
-        json.JSONDecodeError: If the response cannot be parsed as JSON.
-
-    """
-    explorer = CodeExplorer(
+    code_explorer = CodeExplorer(
         project_root=project_root,
         extensions=["py"],
     )
-    code = explorer.explore()
-
     llm_provider = OllamaProvider(
         url=ollama_url,
         port=ollama_port,
         model=ollama_model,
     )
-    logger.info(f"Reviewing code in {project_root} using model {ollama_model} at {ollama_url}:{ollama_port}")
-    async for chunk in llm_provider.stream_generate(
-        prompt=code,
-        system_prompt=PromptFactory.general_review_prompt(),
-    ):
-        print(chunk, end="", flush=True)
+    reviewer = Reviewer(
+        code_explorer=code_explorer,
+        llm_provider=llm_provider,
+    )
+    asyncio.run(reviewer.review())
 
 
 if __name__ == "__main__":

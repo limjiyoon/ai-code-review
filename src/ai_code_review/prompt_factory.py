@@ -1,5 +1,6 @@
 """Factory class to create prompts for AI code review."""
 
+
 class PromptFactory:
     """A factory class to create prompts for AI code review."""
 
