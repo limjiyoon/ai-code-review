@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from ai_code_review.code_explorer import CodeExplorer
+from ai_code_review.code_explorer.project_files_explorer import ProjectFileExplorer
 from ai_code_review.ollama_provider import OllamaProvider
 from ai_code_review.reviewer import Reviewer
 
@@ -46,7 +46,7 @@ def main(
     ollama_model: str,
 ) -> None:
     """Run the AI code review application."""
-    code_explorer = CodeExplorer(
+    code_explorer = ProjectFileExplorer(
         project_root=project_root,
         extensions=["py"],
     )

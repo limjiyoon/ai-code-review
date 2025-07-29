@@ -3,8 +3,8 @@
 from pathlib import Path
 
 
-class CodeExplorer:
-    """Explores the project directory and retrieves code files with specified extensions."""
+class ProjectFileExplorer:
+    """Explores the project directory and retrieves every code files with specified extensions."""
 
     def __init__(
         self,
