@@ -21,11 +21,14 @@ class OllamaProvider:
         url: str,
         port: int,
         model: str,
+        auth_token: str | None = None,
     ):
-        """Initialize the OllamaProvider with the server URL, port, and model."""
+        """Initialize the OllamaProvider with the server URL, port, model, and optional auth token."""
         self._url = f"http://{url}:{port}/api/generate"
         self._model = model
-        self._headers = {"Content-Type": "application/json", "Authorization": "Bearer 1234"}
+        self._headers = {"Content-Type": "application/json"}
+        if auth_token is not None:
+            self._headers["Authorization"] = f"Bearer {auth_token}"
 
     async def stream_generate(
         self,
@@ -49,19 +52,27 @@ class OllamaProvider:
         }
         if system_prompt:
             payload["system"] = system_prompt
-        print(f"Sending request to {self._url} with headers {self._headers}")
+
+        # Mask sensitive header values before logging
+        safe_headers = self._headers.copy()
+        if "Authorization" in safe_headers:
+            safe_headers["Authorization"] = "***"
+        logger.info(f"Sending request to {self._url} with headers {safe_headers}")
 
         async with (
             aiohttp.ClientSession() as session,
             session.post(self._url, json=payload, headers=self._headers) as response,
         ):
             if response.status != HTTP_OK_STATUS:
-                logger.error(f"Error: {response.status}")
+                response_text = await response.text()
+                logger.error(f"Error: {response.status} - Response: {response_text}")
+                raise RuntimeError(f"Ollama API returned status {response.status}: {response_text}")
 
             async for line in response.content:
-                if line.strip():
+                line_str = line.decode("utf-8")
+                if line_str.strip():
                     try:
-                        data = json.loads(line)
+                        data = json.loads(line_str)
                         yield data.get("response", "")
                     except json.JSONDecodeError as e:
                         logger.error(f"JSON decode error: {e}")
