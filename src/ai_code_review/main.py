@@ -15,7 +15,7 @@ from ai_code_review.reviewer import Reviewer
     "--project-root",
     type=Path,
     help="Path to the project root directory containing code files.",
-    default=Path(__file__).parent.parent.resolve(),
+    default=Path(__file__).parent.parent.parent.resolve(),
     show_default=True,
 )
 @click.option(
@@ -47,7 +47,7 @@ def main(
 ) -> None:
     """Run the AI code review application."""
     git_explorer = GitExplorer(
-        repo=project_root.parent,
+        repo=project_root,
         base="main",
         head="HEAD",
     )

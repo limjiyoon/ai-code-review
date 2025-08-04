@@ -1,6 +1,6 @@
 """Base Explorer Class.
 
-This module defines the interface for code explorers that retrieve code snippets using various method.
+This module defines the interface for code explorers that retrieve code snippets using various methods.
 """
 
 from abc import ABC, abstractmethod
