@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from ai_code_review.code_explorer.project_files_explorer import ProjectFileExplorer
+from ai_code_review.code_explorer.git_diff_explorer import GitExplorer
 from ai_code_review.ollama_provider import OllamaProvider
 from ai_code_review.reviewer import Reviewer
 
@@ -15,7 +15,14 @@ from ai_code_review.reviewer import Reviewer
     "--project-root",
     type=Path,
     help="Path to the project root directory containing code files.",
-    default=Path(__file__).parent.parent.resolve(),
+    default=Path(__file__).parent.parent.parent.resolve(),
+    show_default=True,
+)
+@click.option(
+    "--target-branch",
+    default="main",
+    type=str,
+    help="The target branch to compare against (default: main).",
     show_default=True,
 )
 @click.option(
@@ -40,15 +47,16 @@ from ai_code_review.reviewer import Reviewer
     show_default=True,
 )
 def main(
-    project_root: str,
+    project_root: Path,
+    target_branch: str,
     ollama_url: str,
     ollama_port: int,
     ollama_model: str,
 ) -> None:
     """Run the AI code review application."""
-    code_explorer = ProjectFileExplorer(
-        project_root=project_root,
-        extensions=["py"],
+    git_explorer = GitExplorer(
+        repo=project_root,
+        base=target_branch,
     )
     llm_provider = OllamaProvider(
         url=ollama_url,
@@ -56,7 +64,7 @@ def main(
         model=ollama_model,
     )
     reviewer = Reviewer(
-        code_explorer=code_explorer,
+        code_explorer=git_explorer,
         llm_provider=llm_provider,
     )
     asyncio.run(reviewer.review())
