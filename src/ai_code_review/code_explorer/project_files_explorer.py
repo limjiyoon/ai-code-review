@@ -10,7 +10,7 @@ class ProjectFileExplorer:
 
     def __init__(
         self,
-        project_root: str,
+        project_root: str | Path,
         extensions: list[str] | None = None,
     ):
         self._project_root = Path(project_root)

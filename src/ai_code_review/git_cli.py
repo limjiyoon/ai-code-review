@@ -2,6 +2,8 @@
 
 import subprocess
 
+SHA_LOCATION = 2
+
 
 def _run_git_cmd(
     repo: str,
@@ -23,7 +25,8 @@ def _run_git_cmd(
     cmd = ["git", "-C", repo, *args]
     result = subprocess.run(
         cmd,
-        check=False, capture_output=True,
+        check=False,
+        capture_output=True,
         text=True,
     )
     if result.returncode != 0:
@@ -43,6 +46,8 @@ def diff_patch(repo: str, base: str, head: str) -> str:
         str: The diff patch between the two commits.
 
     """
+    if head == "HEAD":
+        return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}")
     return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}...{head}")
 
 
@@ -63,9 +68,20 @@ def file_patch(repo: str, base: str, head: str, file_path: str) -> str:
 
 
 def show_text(repo: str, rev: str, path: str) -> tuple[str, str | None]:
+    """Get the content of a file at a specific revision in a git repository.
+
+    Args:
+        repo (str): Path to the git repository.
+        rev (str): The commit hash or branch name.
+        path (str): The path to the file in the repository.
+
+    Returns:
+        tuple[str, str | None]: The content of the file and its SHA hash.
+
+    """
     ls_tree = _run_git_cmd(repo, "ls-tree", rev, "--", path).strip()
     if not ls_tree:
         return "", None
-    sha = ls_tree.split()[2] if len(ls_tree.split()) > 2 else None
+    sha = ls_tree.split()[SHA_LOCATION] if len(ls_tree.split()) > SHA_LOCATION else None
     txt = _run_git_cmd(repo, "show", f"{rev}:{path}").strip()
     return txt, sha

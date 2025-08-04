@@ -5,7 +5,7 @@ from pathlib import Path
 
 import click
 
-from ai_code_review.code_explorer.project_files_explorer import ProjectFileExplorer
+from ai_code_review.code_explorer.git_diff_explorer import GitExplorer
 from ai_code_review.ollama_provider import OllamaProvider
 from ai_code_review.reviewer import Reviewer
 
@@ -40,15 +40,16 @@ from ai_code_review.reviewer import Reviewer
     show_default=True,
 )
 def main(
-    project_root: str,
+    project_root: Path,
     ollama_url: str,
     ollama_port: int,
     ollama_model: str,
 ) -> None:
     """Run the AI code review application."""
-    code_explorer = ProjectFileExplorer(
-        project_root=project_root,
-        extensions=["py"],
+    git_explorer = GitExplorer(
+        repo=project_root.parent,
+        base="main",
+        head="HEAD",
     )
     llm_provider = OllamaProvider(
         url=ollama_url,
@@ -56,7 +57,7 @@ def main(
         model=ollama_model,
     )
     reviewer = Reviewer(
-        code_explorer=code_explorer,
+        code_explorer=git_explorer,
         llm_provider=llm_provider,
     )
     asyncio.run(reviewer.review())
