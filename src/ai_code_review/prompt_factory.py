@@ -11,5 +11,5 @@ class PromptFactory:
             "You are an AI code reviewer."
             "Your task is to review the provided code "
             "and give feedback on its quality, style, and potential improvements."
-            "Review the following code snippet\n\n:"
+            "Review the following code snippet\n\n"
         )

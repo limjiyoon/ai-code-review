@@ -36,7 +36,7 @@ from ai_code_review.reviewer import Reviewer
     "--ollama-model",
     default="qwen2.5-coder:7b",
     type=str,
-    help="The model to use for code review (default: devstral).",
+    help="The model to use for code review (default: qwen2.5-coder:7b).",
     show_default=True,
 )
 def main(
