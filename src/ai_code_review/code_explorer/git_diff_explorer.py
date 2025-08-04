@@ -16,16 +16,14 @@ class GitExplorer(BaseExplorer):
         self,
         repo: str | Path,
         base: str = "main",
-        head: str = "HEAD",
     ):
         self._repo = Path(repo)
         self._base = base
-        self._head = head
 
     def explore(self) -> str:
         """Explores the git repository and returns the diff patch."""
-        return diff_patch(str(self._repo), self._base, self._head)
+        return diff_patch(str(self._repo), self._base)
 
     def file_patch(self, file_path: str) -> str:
         """Get the diff patch for a specific file between two commits in a git repository."""
-        return file_patch(str(self._repo), self._base, self._head, file_path)
+        return file_patch(str(self._repo), self._base, file_path)

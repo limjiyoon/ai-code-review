@@ -2,7 +2,7 @@
 
 import subprocess
 
-SHA_LOCATION = 2
+SHA_LOCATION = 2  # SHA column position in git ls-tree
 
 
 def _run_git_cmd(
@@ -34,37 +34,33 @@ def _run_git_cmd(
     return result.stdout.strip()
 
 
-def diff_patch(repo: str, base: str, head: str) -> str:
+def diff_patch(repo: str, base: str) -> str:
     """Get the diff patch between two commits in a git repository.
 
     Args:
         repo (str): Path to the git repository.
         base (str): The base commit hash or branch.
-        head (str): The head commit hash or branch.
 
     Returns:
         str: The diff patch between the two commits.
 
     """
-    if head == "HEAD":
-        return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}")
-    return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}...{head}")
+    return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}")
 
 
-def file_patch(repo: str, base: str, head: str, file_path: str) -> str:
+def file_patch(repo: str, base: str, file_path: str) -> str:
     """Get the diff patch for a specific file between two commits in a git repository.
 
     Args:
         repo (str): Path to the git repository.
         base (str): The base commit hash or branch.
-        head (str): The head commit hash or branch.
         file_path (str): The path to the file in the repository.
 
     Returns:
         str: The diff patch for the specified file.
 
     """
-    return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}...{head}", "--", file_path)
+    return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}", "--", file_path)
 
 
 def show_text(repo: str, rev: str, path: str) -> tuple[str, str | None]:

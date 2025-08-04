@@ -19,6 +19,13 @@ from ai_code_review.reviewer import Reviewer
     show_default=True,
 )
 @click.option(
+    "--target-branch",
+    default="main",
+    type=str,
+    help="The target branch to compare against (default: main).",
+    show_default=True,
+)
+@click.option(
     "--ollama-url",
     default="127.0.0.1",
     type=str,
@@ -41,6 +48,7 @@ from ai_code_review.reviewer import Reviewer
 )
 def main(
     project_root: Path,
+    target_branch: str,
     ollama_url: str,
     ollama_port: int,
     ollama_model: str,
@@ -48,8 +56,7 @@ def main(
     """Run the AI code review application."""
     git_explorer = GitExplorer(
         repo=project_root,
-        base="main",
-        head="HEAD",
+        base=target_branch,
     )
     llm_provider = OllamaProvider(
         url=ollama_url,
