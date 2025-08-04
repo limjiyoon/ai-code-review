@@ -34,18 +34,23 @@ def _run_git_cmd(
     return result.stdout.strip()
 
 
-def diff_patch(repo: str, base: str) -> str:
+def diff_patch(repo: str, base: str, staged_only: bool = False) -> str:
     """Get the diff patch between two commits in a git repository.
 
     Args:
         repo (str): Path to the git repository.
         base (str): The base commit hash or branch.
+        staged_only (bool): If true, compare
 
     Returns:
         str: The diff patch between the two commits.
 
     """
-    return _run_git_cmd(repo, "diff", "-p", "-U3", "-M", "-C", f"{base}")
+    args = ["-p", "-U3", "-M", "-C", f"{base}"]
+    if staged_only:
+        args.append("--cached")
+
+    return _run_git_cmd(repo, "diff", *args)
 
 
 def file_patch(repo: str, base: str, file_path: str) -> str:
