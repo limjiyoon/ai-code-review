@@ -1,11 +1,17 @@
 [project]
-name = ""
+name = "ai-code-review"
 version = "0.1.0"
 description = "Add your description here"
 authors = [
     { name = "limjiyoon", email = "luinpark@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "aiohttp>=3.12.14",
+    "click>=8.2.1",
+    "loguru>=0.7.3",
+    "orjson>=3.11.1",
+    "pydantic>=2.11.7",
+]
 readme = "README.md"
 requires-python = ">= 3.13"
 
@@ -16,9 +22,9 @@ build-backend = "hatchling.build"
 [tool.uv]
 managed = true
 dev-dependencies = [
-    "pyright>=1.1.400",
-    "pytest>=8.3.5",
-    "pytest-cov>=6.1.1",
+    "pyright>=1.1.403",
+    "pytest>=8.4.1",
+    "pytest-cov>=6.2.1",
     "pre-commit>=4.2.0",
 ]
 
@@ -26,7 +32,7 @@ dev-dependencies = [
 allow-direct-references = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/"]
+packages = ["src/ai_code_review"]
 
 [tool.ruff]
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
