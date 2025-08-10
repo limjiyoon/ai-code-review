@@ -6,8 +6,8 @@ from pathlib import Path
 import click
 
 from ai_code_review.code_explorer.git_diff_explorer import GitExplorer
-from ai_code_review.lmstudio_provider import LMStudioProvider
-from ai_code_review.ollama_provider import OllamaProvider
+from ai_code_review.providers.lmstudio_provider import LMStudioProvider
+from ai_code_review.providers.ollama_provider import OllamaProvider
 from ai_code_review.reviewer import Reviewer
 
 
@@ -35,7 +35,7 @@ from ai_code_review.reviewer import Reviewer
 )
 @click.option(
     "--llm-port",
-    default=11434,
+    default=1234,
     type=int,
     help="The port of the LLM server (default: 11434 for Ollama, 1234 for LMStudio).",
     show_default=True,
@@ -49,7 +49,7 @@ from ai_code_review.reviewer import Reviewer
 )
 @click.option(
     "--provider",
-    default="ollama",
+    default="lmstudio",
     type=click.Choice(["ollama", "lmstudio"]),
     help="The LLM provider to use (default: ollama).",
     show_default=True,

@@ -1,6 +1,6 @@
 """Orchestrate the code review process."""
 
-from ai_code_review.base_llm_provider import BaseLLMProvider
+from ai_code_review.providers.base_llm_provider import BaseLLMProvider
 from ai_code_review.code_explorer.base_explorer import BaseExplorer
 from ai_code_review.prompt_factory import PromptFactory
 
