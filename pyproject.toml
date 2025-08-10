@@ -100,7 +100,7 @@ lint.exclude = [
     "node_modules",
     "venv",
 ]
-
+lint.pylint.max-args = 12
 
 [tool.pyright]
 reportMissingImports = true

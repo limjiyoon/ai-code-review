@@ -6,7 +6,8 @@ from pathlib import Path
 import click
 
 from ai_code_review.code_explorer.git_diff_explorer import GitExplorer
-from ai_code_review.ollama_provider import OllamaProvider
+from ai_code_review.providers.lmstudio_provider import LMStudioProvider
+from ai_code_review.providers.ollama_provider import OllamaProvider
 from ai_code_review.reviewer import Reviewer
 
 
@@ -26,48 +27,74 @@ from ai_code_review.reviewer import Reviewer
     show_default=True,
 )
 @click.option(
-    "--ollama-url",
+    "--url",
     default="127.0.0.1",
     type=str,
-    help="The URL of the Ollama server (default: localhost).",
+    help="The URL of the LLM server (default: localhost).",
     show_default=True,
 )
 @click.option(
-    "--ollama-port",
-    default=11434,
+    "--port",
+    default=1234,
     type=int,
-    help="The port of the Ollama server (default: 11434).",
+    help="The port of the LLM server (default: 1234 for LMStudio, 11434 for Ollama).",
     show_default=True,
 )
 @click.option(
-    "--ollama-model",
-    default="qwen2.5-coder:7b",
+    "--model",
+    default="gpt-oss:20b",
     type=str,
-    help="The model to use for code review (default: qwen2.5-coder:7b).",
+    help="The llm model name to use for code review.",
     show_default=True,
+)
+@click.option(
+    "--provider",
+    default="lmstudio",
+    type=click.Choice(["ollama", "lmstudio"]),
+    help="The LLM provider to use (default: lmstudio).",
+    show_default=True,
+)
+@click.option(
+    "--show-reasoning",
+    is_flag=False,
+    help="Print reasoning in the response. If set, reasoning will be shown.",
 )
 def main(
     project_root: Path,
     target_branch: str,
-    ollama_url: str,
-    ollama_port: int,
-    ollama_model: str,
+    url: str,
+    port: int,
+    model: str,
+    provider: str,
+    show_reasoning: bool = False,
 ) -> None:
     """Run the AI code review application."""
+    # Provider registry mapping
+    providers = {
+        "ollama": OllamaProvider,
+        "lmstudio": LMStudioProvider,
+    }
+
     git_explorer = GitExplorer(
         repo=project_root,
         base=target_branch,
     )
-    llm_provider = OllamaProvider(
-        url=ollama_url,
-        port=ollama_port,
-        model=ollama_model,
+
+    provider_class = providers.get(provider)
+    if not provider_class:
+        raise ValueError(f"Unsupported provider: {provider}. Available providers: {list(providers.keys())}")
+
+    llm_provider = provider_class(
+        url=url,
+        port=port,
+        model=model,
     )
+
     reviewer = Reviewer(
         code_explorer=git_explorer,
         llm_provider=llm_provider,
     )
-    asyncio.run(reviewer.review())
+    asyncio.run(reviewer.review(show_reasoning=show_reasoning))
 
 
 if __name__ == "__main__":
