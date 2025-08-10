@@ -1,9 +1,10 @@
 """Orchestrate the code review process."""
+
 from loguru import logger
 
-from ai_code_review.providers.base_llm_provider import BaseLLMProvider
 from ai_code_review.code_explorer.base_explorer import BaseExplorer
 from ai_code_review.prompt_factory import PromptFactory
+from ai_code_review.providers.base_llm_provider import BaseLLMProvider
 
 
 class Reviewer:
@@ -17,7 +18,7 @@ class Reviewer:
         self._code_explorer = code_explorer
         self._llm_provider = llm_provider
 
-    async def review(self) -> str:
+    async def review(self, show_reasoning: bool) -> str:
         """Review the code."""
         target_codes = self._code_explorer.explore()
         if not target_codes:
@@ -28,6 +29,7 @@ class Reviewer:
         async for chunk in self._llm_provider.stream_generate(
             prompt=target_codes,
             system_prompt=PromptFactory.general_review_prompt(),
+            show_reasoning=show_reasoning,
         ):
             result.append(chunk)
             print(chunk, end="", flush=True)

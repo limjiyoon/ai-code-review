@@ -54,6 +54,11 @@ from ai_code_review.reviewer import Reviewer
     help="The LLM provider to use (default: lmstudio).",
     show_default=True,
 )
+@click.option(
+    "--show-reasoning",
+    is_flag=False,
+    help="Print reasoning in the response. If set, reasoning will be shown.",
+)
 def main(
     project_root: Path,
     target_branch: str,
@@ -61,6 +66,7 @@ def main(
     port: int,
     model: str,
     provider: str,
+    show_reasoning: bool = False,
 ) -> None:
     """Run the AI code review application."""
     # Provider registry mapping
@@ -88,7 +94,7 @@ def main(
         code_explorer=git_explorer,
         llm_provider=llm_provider,
     )
-    asyncio.run(reviewer.review())
+    asyncio.run(reviewer.review(show_reasoning=show_reasoning))
 
 
 if __name__ == "__main__":
