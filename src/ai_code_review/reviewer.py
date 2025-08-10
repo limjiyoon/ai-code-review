@@ -1,4 +1,5 @@
 """Orchestrate the code review process."""
+from loguru import logger
 
 from ai_code_review.providers.base_llm_provider import BaseLLMProvider
 from ai_code_review.code_explorer.base_explorer import BaseExplorer
@@ -20,6 +21,7 @@ class Reviewer:
         """Review the code."""
         target_codes = self._code_explorer.explore()
         if not target_codes:
+            logger.warning("No code to review.")
             return "No code to review."
 
         result = []
