@@ -6,10 +6,12 @@ import aiohttp
 import orjson as json
 from loguru import logger
 
+from ai_code_review.base_llm_provider import BaseLLMProvider
+
 HTTP_OK_STATUS = 200
 
 
-class OllamaProvider:
+class OllamaProvider(BaseLLMProvider):
     """Provider class for interacting with the Ollama API.
 
     This class handles the connection to the Ollama server and provides methods

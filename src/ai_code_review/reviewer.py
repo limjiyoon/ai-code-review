@@ -1,7 +1,7 @@
 """Orchestrate the code review process."""
 
+from ai_code_review.base_llm_provider import BaseLLMProvider
 from ai_code_review.code_explorer.base_explorer import BaseExplorer
-from ai_code_review.ollama_provider import OllamaProvider
 from ai_code_review.prompt_factory import PromptFactory
 
 
@@ -11,7 +11,7 @@ class Reviewer:
     def __init__(
         self,
         code_explorer: BaseExplorer,
-        llm_provider: OllamaProvider,
+        llm_provider: BaseLLMProvider,
     ):
         self._code_explorer = code_explorer
         self._llm_provider = llm_provider
