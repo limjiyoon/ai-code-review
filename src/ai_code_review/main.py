@@ -27,39 +27,39 @@ from ai_code_review.reviewer import Reviewer
     show_default=True,
 )
 @click.option(
-    "--llm-url",
+    "--url",
     default="127.0.0.1",
     type=str,
     help="The URL of the LLM server (default: localhost).",
     show_default=True,
 )
 @click.option(
-    "--llm-port",
+    "--port",
     default=1234,
     type=int,
-    help="The port of the LLM server (default: 11434 for Ollama, 1234 for LMStudio).",
+    help="The port of the LLM server (default: 1234 for LMStudio, 11434 for Ollama).",
     show_default=True,
 )
 @click.option(
-    "--llm-model",
+    "--model",
     default="gpt-oss:20b",
     type=str,
-    help="The model to use for code review.",
+    help="The llm model name to use for code review.",
     show_default=True,
 )
 @click.option(
     "--provider",
     default="lmstudio",
     type=click.Choice(["ollama", "lmstudio"]),
-    help="The LLM provider to use (default: ollama).",
+    help="The LLM provider to use (default: lmstudio).",
     show_default=True,
 )
 def main(
     project_root: Path,
     target_branch: str,
-    llm_url: str,
-    llm_port: int,
-    llm_model: str,
+    url: str,
+    port: int,
+    model: str,
     provider: str,
 ) -> None:
     """Run the AI code review application."""
@@ -79,9 +79,9 @@ def main(
         raise ValueError(f"Unsupported provider: {provider}. Available providers: {list(providers.keys())}")
 
     llm_provider = provider_class(
-        url=llm_url,
-        port=llm_port,
-        model=llm_model,
+        url=url,
+        port=port,
+        model=model,
     )
 
     reviewer = Reviewer(
